@@ -1,0 +1,26 @@
+1. evn
+=> Tạo DB
+
+2. Cấu hình Pusher (trong file env)
+BROADCAST_DRIVER=pusher
+PUSHER_APP_ID="1779711"
+PUSHER_APP_KEY="eedb7430b2fcd144ab35"
+PUSHER_APP_SECRET="159c5dca7862896afa16"
+PUSHER_APP_CLUSTER=ap1
+
+3. Cấu hình bảng user | I
+php artisan migrate
+Trong DatabaseSeeder, bỏ comment \App\Models\User::factory(10)->create();
+php artisan db:seed
+
+4. composer require laravel/ui
+php artisan ui bootstrap
+php artisan ui bootstrap --auth
+
+5. composer require pusher/pusher-php-server
+
+6. npm install
+npm install --save-dev laravel-echo pusher-js
+
+7. php artisan serve
+npm run dev
