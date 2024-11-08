@@ -85,75 +85,79 @@
 
 @section('script')
     <script type=module>
+        // Tham gia kênh 'chat' và xử lý các sự kiện khi có người tham gia, rời đi, hoặc khi có tin nhắn mới.
         Echo.join('chat')
+            // Khi người dùng khác đã ở trong kênh, hiển thị trạng thái của họ
             .here(users => {
-                // console.log(users, 'here');
                 users.forEach(item => {
+                    // Tìm phần tử có id là `link_{item.id}` để xác định vị trí của user
                     let el = document.querySelector(`#link_${item.id}`);
                     console.log(el);
 
+                    // Tạo một phần tử để hiển thị trạng thái online cho user
                     let elementStatus = document.createElement('div');
                     elementStatus.classList.add('status');
                     if (el) {
                         el.appendChild(elementStatus);
                     }
-                })
+                });
             })
+            // Xử lý sự kiện khi một người dùng mới tham gia kênh
             .joining(user => {
-
+                // Tìm phần tử với id tương ứng với user mới
                 let el = document.querySelector(`#link_${user.id}`);
-                console.log(el);
-
+                // Tạo và thêm phần tử trạng thái cho user mới
                 let elementStatus = document.createElement('div');
                 elementStatus.classList.add('status');
                 if (el) {
                     el.appendChild(elementStatus);
                 }
 
-
                 console.log(`${user.name} joined the chat.`);
-                // console.log(user, 'joining');
-
             })
+
+            // Xử lý sự kiện khi một người dùng rời khỏi kênh
             .leaving(user => {
-
+                // Tìm phần tử với id tương ứng với user đã rời đi
                 let el = document.querySelector(`#link_${user.id}`);
-                // console.log(el);
-
                 let elementStatus = el.querySelector('.status');
+                // Nếu phần tử trạng thái tồn tại, xóa nó khỏi giao diện
                 if (elementStatus) {
                     el.removeChild(elementStatus);
                 }
                 console.log(`${user.name} left the chat.`);
-                // console.log(user, 'leaving');
-
             })
-            // listen event từ UserOnlined
+
+            // Nghe sự kiện 'UserOnlined' để hiển thị tin nhắn mới trong kênh chat
             .listen('UserOnlined', event => {
-                // console.log(event); //log user va message
-                let blockChat = document.querySelector('.block-chat');
-                let elementChat = document.querySelector('li');
-                elementChat.textContent = `${event.user.name} : ${event.message}`
+                let blockChat = document.querySelector('.block-chat'); // Vùng hiển thị tin nhắn
+                let elementChat = document.createElement('li'); // Tạo phần tử cho tin nhắn mới
+
+                // Hiển thị tin nhắn của người dùng theo định dạng "user: message"
+                elementChat.textContent = `${event.user.name} : ${event.message}`;
+
+                // Nếu tin nhắn là của chính user hiện tại, thêm class để định dạng khác biệt
                 if (event.user.id == '{{ Auth::user()->id }}') {
                     elementChat.classList.add('my-message');
                 }
+
+                // Thêm tin nhắn vào vùng chat
                 blockChat.appendChild(elementChat);
+            });
 
-            })
-
-
+        // Lấy các phần tử cho input và button gửi tin nhắn
         let inputChat = document.querySelector('#inputChat');
         let btnSend = document.querySelector('#btnSend');
 
+        // Thêm sự kiện click cho button gửi tin nhắn
         btnSend.addEventListener('click', function() {
-            // console.log('abc');
+            // Gửi tin nhắn đến backend qua route 'sendMessage' và truyền nội dung tin nhắn từ input
             axios.post('{{ route('sendMessage') }}', {
                     'message': inputChat.value
                 })
                 .then(data => {
-                    console.log(data.data.success);
-
-                })
+                    console.log(data.data.success); // Kiểm tra phản hồi từ server (thành công hay không)
+                });
         });
     </script>
 @endsection
